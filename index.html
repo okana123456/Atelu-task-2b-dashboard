@@ -3,573 +3,871 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TLC Progress Review Dashboard — Q1 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<title>TLC Progress Review Dashboard — Q1 2026 | Charles Atelu</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ink:#1C1917;--ink2:#44403C;--ink3:#78716C;--ink4:#A8A29E;
-  --surface:#FAFAF9;--white:#FFFFFF;--rule:#E7E5E4;
-  --green-bg:#F0FDF4;--green-mid:#16A34A;--green-txt:#14532D;--green-bdr:#BBF7D0;
-  --amber-bg:#FFFBEB;--amber-mid:#D97706;--amber-txt:#78350F;--amber-bdr:#FDE68A;
-  --red-bg:#FFF1F2;--red-mid:#E11D48;--red-txt:#881337;--red-bdr:#FECDD3;
-  --blue-bg:#EFF6FF;--blue-mid:#2563EB;--blue-txt:#1E3A8A;--blue-bdr:#BFDBFE;
-  --teal:#0F766E;--accent:#166534;
+
+:root {
+  --ink:#0F0E0D;--ink2:#3D3935;--ink3:#6B6560;--ink4:#A09890;
+  --bg:#F7F5F2;--white:#FFFFFF;--rule:#E8E4DF;
+  --green:#16A34A;--green-bg:#F0FDF4;--green-dark:#14532D;--green-bdr:#BBF7D0;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-dark:#78350F;--amber-bdr:#FDE68A;
+  --red:#DC2626;--red-bg:#FFF1F2;--red-dark:#881337;--red-bdr:#FECDD3;
+  --blue:#2563EB;--blue-bg:#EFF6FF;--blue-dark:#1E3A8A;--blue-bdr:#BFDBFE;
+  --teal:#0F766E;--purple:#7C3AED;--purple-bg:#F5F3FF;
+  --accent:#166534;
+  --nav-h:60px;
+  --card-r:14px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,.06);
 }
-body{font-family:'Inter',system-ui,sans-serif;background:#F5F4F2;color:var(--ink);line-height:1.5;min-height:100vh}
 
-/* ── LAYOUT ── */
-.wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;min-height:100vh;overflow-x:hidden}
 
-/* ── MASTHEAD ── */
-.masthead{background:var(--ink);color:#fff;border-radius:16px;padding:2rem 2.5rem;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start}
-.masthead-org{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#A8A29E;margin-bottom:.35rem}
-.masthead-title{font-family:'DM Serif Display',Georgia,serif;font-size:28px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:.5rem}
-.masthead-sub{font-size:13px;color:#A8A29E}
-.masthead-right{text-align:right}
-.status-pill{display:inline-flex;align-items:center;gap:7px;background:var(--green-bg);border:1px solid var(--green-bdr);border-radius:99px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--green-txt)}
-.status-pill .pulse{width:8px;height:8px;border-radius:50%;background:var(--green-mid);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.period-tag{font-size:12px;color:#78716C;margin-top:.5rem}
+/* ── PARTICLES BG ── */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
 
-/* ── FIVE QUESTIONS BANNER ── */
-.five-q{background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:1.25rem 1.75rem;margin-bottom:1.5rem}
-.five-q-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:600;margin-bottom:.75rem}
-.five-q-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.fq{background:var(--surface);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--teal)}
-.fq-num{font-size:11px;font-weight:600;color:var(--teal);margin-bottom:3px}
-.fq-txt{font-size:12px;color:var(--ink2);line-height:1.4}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 1.5rem;gap:1.5rem}
+.nav-brand{font-family:'DM Serif Display',Georgia,serif;font-size:18px;color:var(--ink);white-space:nowrap;margin-right:auto}
+.nav-brand span{color:var(--teal)}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-link{font-size:12px;font-weight:500;color:var(--ink3);padding:6px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:.2s;border:none;background:none}
+.nav-link:hover,.nav-link.active{background:var(--green-bg);color:var(--green-dark)}
+.nav-period{font-size:11px;color:var(--ink4);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
 
-/* ── SECTION LABELS ── */
-.section-wrap{margin-bottom:1.5rem}
-.section-head{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
-.section-head h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ink3)}
-.section-head::after{content:'';flex:1;height:1px;background:var(--rule)}
+/* ── WRAPPER ── */
+.wrap{max-width:1160px;margin:0 auto;padding:calc(var(--nav-h) + 1.5rem) 1.5rem 5rem;position:relative;z-index:1}
 
-/* ── KPI CARDS ── */
-.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:1.5rem}
-.kpi{background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:1rem;position:relative;overflow:hidden}
+/* ── HERO ── */
+.hero{background:var(--ink);color:#fff;border-radius:20px;padding:2.5rem 3rem;margin-bottom:2rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(20,150,80,.25) 0%,transparent 60%)}
+.hero-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.5rem}
+.hero-title{font-family:'DM Serif Display',Georgia,serif;font-size:36px;font-weight:400;line-height:1.15;margin-bottom:.6rem}
+.hero-title em{font-style:italic;color:#6EE7B7}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.55);max-width:460px;line-height:1.7}
+.hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:.75rem;position:relative;z-index:1}
+.status-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green-bg);border:1px solid var(--green-bdr);border-radius:99px;padding:8px 18px;font-size:13px;font-weight:600;color:var(--green-dark)}
+.hero-meta{font-size:11px;color:rgba(255,255,255,.4);text-align:right}
+.author-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:6px}
+.author-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#34D399,#059669);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+
+/* ── SECTION ── */
+section{margin-bottom:2.5rem}
+.section-hd{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem}
+.section-hd h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink3);white-space:nowrap}
+.section-hd::after{content:'';flex:1;height:1px;background:var(--rule)}
+.section-hd .count-pill{background:var(--rule);border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--ink3)}
+
+/* ── FIVE Q ── */
+.five-q{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.5rem 2rem;box-shadow:var(--shadow)}
+.fq-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:600;margin-bottom:1rem}
+.fq-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.fq-card{background:var(--bg);border-radius:10px;padding:.85rem 1rem;border-left:3px solid var(--teal);cursor:default;transition:.2s}
+.fq-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.fq-num{font-size:10px;font-weight:700;color:var(--teal);margin-bottom:4px}
+.fq-txt{font-size:12px;color:var(--ink2);line-height:1.45}
+
+/* ── KPI ROW ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.kpi{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.1rem;position:relative;overflow:hidden;cursor:default;transition:.2s;box-shadow:var(--shadow)}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.kpi.green::before{background:var(--green-mid)}
-.kpi.amber::before{background:var(--amber-mid)}
-.kpi.red::before{background:var(--red-mid)}
+.kpi.green::before{background:var(--green)}
+.kpi.amber::before{background:var(--amber)}
+.kpi.red::before{background:var(--red)}
 .kpi-label{font-size:10px;color:var(--ink3);font-weight:500;line-height:1.4;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
-.kpi-val{font-size:26px;font-weight:600;color:var(--ink);line-height:1;margin-bottom:4px}
+.kpi-val{font-size:28px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:3px}
 .kpi-val sup{font-size:13px;font-weight:500;color:var(--ink3)}
-.kpi-target{font-size:10px;color:var(--ink4);margin-bottom:6px}
-.kpi-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
-.kpi-badge.green{background:var(--green-bg);color:var(--green-txt)}
-.kpi-badge.amber{background:var(--amber-bg);color:var(--amber-txt)}
-.kpi-badge.red{background:var(--red-bg);color:var(--red-txt)}
+.kpi-target{font-size:10px;color:var(--ink4);margin-bottom:7px}
+.kpi-badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px}
+.kpi-badge.green{background:var(--green-bg);color:var(--green-dark)}
+.kpi-badge.amber{background:var(--amber-bg);color:var(--amber-dark)}
+.kpi-badge.red{background:var(--red-bg);color:var(--red-dark)}
 
-/* ── TWO-COL LAYOUT ── */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
-.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:1.5rem}
+/* ── CHARTS ROW ── */
+.charts-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}
+.chart-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.4rem;box-shadow:var(--shadow);position:relative}
+.chart-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:1rem}
+.chart-domain{font-size:10px;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+canvas{max-height:200px}
 
-/* ── CARDS ── */
-.card{background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:1.25rem 1.4rem}
-.card-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:1rem}
-.card-domain{font-size:10px;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
-
-/* ── INDICATOR ROWS ── */
-.ind-row{margin-bottom:12px}
-.ind-row:last-child{margin-bottom:0}
-.ind-name{font-size:12px;color:var(--ink2);margin-bottom:4px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.ind-name span:last-child{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap}
-.bar-track{height:5px;background:var(--rule);border-radius:99px;overflow:hidden;margin-bottom:2px}
-.bar-fill{height:100%;border-radius:99px}
-.bar-fill.green{background:var(--green-mid)}
-.bar-fill.amber{background:var(--amber-mid)}
-.bar-fill.red{background:var(--red-mid)}
+/* ── INDICATOR CARDS ── */
+.ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ind-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.4rem 1.6rem;box-shadow:var(--shadow)}
+.ind-card-domain{font-size:10px;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.ind-card-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1.1rem}
+.ind-row{margin-bottom:13px}
+.ind-row:last-of-type{margin-bottom:0}
+.ind-name{font-size:12px;color:var(--ink2);margin-bottom:4px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.ind-name span:last-child{font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap}
+.bar-track{height:6px;background:var(--rule);border-radius:99px;overflow:hidden;margin-bottom:3px;cursor:pointer}
+.bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1),transform .1s}
+.bar-fill.green{background:linear-gradient(90deg,#22C55E,var(--green))}
+.bar-fill.amber{background:linear-gradient(90deg,#FBBF24,var(--amber))}
+.bar-fill.red{background:linear-gradient(90deg,#F87171,var(--red))}
 .ind-meta{font-size:10px;color:var(--ink4);display:flex;justify-content:space-between}
+.insight{font-size:11px;color:var(--teal);font-style:italic;margin-top:5px;padding-left:9px;border-left:2px solid #99F6E4;line-height:1.5}
+.dq{font-size:11px;color:var(--teal);font-style:italic;margin-top:.75rem;padding:.6rem .8rem;border-radius:8px;background:rgba(15,118,110,.05);line-height:1.5;border-left:3px solid #5EEAD4}
 
-/* ── DECISION Q ── */
-.dq{font-size:11px;color:var(--teal);font-style:italic;margin-top:6px;padding-top:6px;border-top:1px dashed #D1FAE5;line-height:1.5}
-
-/* ── QUALITATIVE CARDS ── */
-.qual-card{background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:1.25rem 1.4rem}
-.qual-card .card-domain{margin-bottom:4px}
-.qual-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:.6rem}
+/* ── QUAL CARDS ── */
+.qual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.qual-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.4rem 1.6rem;box-shadow:var(--shadow)}
+.qual-card-domain{font-size:10px;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.qual-card-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:.75rem}
 .qual-body{font-size:12px;color:var(--ink2);line-height:1.7}
-.quote-pull{border-left:3px solid var(--green-mid);padding-left:12px;margin:8px 0;font-size:13px;color:var(--ink);font-style:italic;line-height:1.6}
+.quote-pull{border-left:3px solid var(--green);padding:.6rem 1rem;margin:.6rem 0;font-size:13px;color:var(--ink);font-style:italic;line-height:1.65;background:var(--green-bg);border-radius:0 8px 8px 0}
 .quote-attr{font-size:11px;color:var(--ink4);font-style:normal;display:block;margin-top:4px}
 
-/* ── SESSIONS TABLE ── */
-.session-table{width:100%;border-collapse:collapse;font-size:12px}
-.session-table th{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--rule);text-align:left;background:var(--surface)}
-.session-table td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink2)}
-.session-table tr:last-child td{border-bottom:none}
-.session-table tr:hover td{background:var(--surface)}
-.s-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
-.s-delivered{background:var(--green-bg);color:var(--green-txt)}
-.s-prep{background:var(--blue-bg);color:var(--blue-txt)}
+/* ── SESSION TABLE ── */
+.table-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--rule);text-align:left;background:var(--bg);white-space:nowrap}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:.15s}
+tbody tr:hover td{background:var(--bg)}
+.s-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.s-delivered{background:var(--green-bg);color:var(--green-dark)}
+.s-prep{background:var(--blue-bg);color:var(--blue-dark)}
 .s-concept{background:#F3F4F6;color:#374151}
-.s-search{background:var(--amber-bg);color:var(--amber-txt)}
-.s-schedule{background:#F5F3FF;color:#5B21B6}
+.s-search{background:var(--amber-bg);color:var(--amber-dark)}
+.s-schedule{background:var(--purple-bg);color:var(--purple)}
+.s-planning{background:#FFF7ED;color:#9A3412}
 
-/* ── CHART WRAPPER ── */
-.chart-wrap{position:relative;width:100%}
+/* ── PLANNER ── */
+.planner-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.quarter-col{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);overflow:hidden;box-shadow:var(--shadow)}
+.quarter-hd{padding:.8rem 1rem;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--rule)}
+.quarter-hd.q1{background:var(--green-bg);color:var(--green-dark)}
+.quarter-hd.q2{background:var(--blue-bg);color:var(--blue-dark)}
+.quarter-hd.q3{background:var(--amber-bg);color:var(--amber-dark)}
+.quarter-hd.q4{background:var(--purple-bg);color:var(--purple)}
+.offering-item{padding:.85rem 1rem;border-bottom:1px solid var(--rule);transition:.15s;cursor:pointer}
+.offering-item:last-child{border-bottom:none}
+.offering-item:hover{background:var(--bg)}
+.offering-name{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.offering-meta{font-size:10px;color:var(--ink3);display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:5px}
+.offering-target{font-size:10px;color:var(--ink4)}
 
 /* ── STORIES ── */
-.stories{background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1px solid var(--green-bdr);border-radius:12px;padding:1.25rem 1.4rem;margin-bottom:1.5rem}
-.stories-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--green-mid);margin-bottom:.5rem;display:flex;align-items:center;gap:6px}
-.stories-label::before{content:'★';font-size:12px}
-.stories-title{font-size:14px;font-weight:600;color:var(--green-txt);margin-bottom:.5rem}
-.stories-body{font-size:13px;color:#166534;line-height:1.7}
-.stories-capture{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--green-bdr)}
-.stories-capture-label{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--green-mid);font-weight:600;margin-bottom:6px}
-.capture-q-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.cq{font-size:11px;color:var(--green-txt);background:rgba(255,255,255,.6);border-radius:6px;padding:6px 8px;line-height:1.4}
+.stories-card{background:linear-gradient(135deg,#ECFDF5 0%,#F0FDF4 100%);border:1px solid var(--green-bdr);border-radius:var(--card-r);padding:1.6rem 2rem;box-shadow:var(--shadow)}
+.stories-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--green);margin-bottom:.5rem;display:flex;align-items:center;gap:8px}
+.stories-title{font-size:16px;font-weight:600;color:var(--green-dark);margin-bottom:.6rem}
+.stories-body{font-size:13px;color:var(--accent);line-height:1.7;margin-bottom:1rem}
+.capture-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-weight:600;margin-bottom:.6rem}
+.capture-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.cq{font-size:11px;color:var(--green-dark);background:rgba(255,255,255,.65);border-radius:8px;padding:7px 10px;line-height:1.4;border:1px solid var(--green-bdr)}
 
 /* ── FLAGS ── */
-.flag{display:flex;gap:12px;background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:10px}
-.flag-icon{flex-shrink:0;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.flag-red{background:var(--red-bg);border:1px solid var(--red-bdr)}
-.flag-amber{background:var(--amber-bg);border:1px solid var(--amber-bdr)}
+.flags-col{display:flex;flex-direction:column;gap:10px}
+.flag{display:flex;gap:12px;background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:1.1rem 1.25rem;box-shadow:var(--shadow);transition:.2s}
+.flag:hover{box-shadow:var(--shadow-md)}
+.flag-icon{flex-shrink:0;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.flag-icon.red{background:var(--red-bg);border:1px solid var(--red-bdr)}
+.flag-icon.amber{background:var(--amber-bg);border:1px solid var(--amber-bdr)}
 .flag-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
 .flag-body{font-size:12px;color:var(--ink2);line-height:1.5;margin-bottom:4px}
 .flag-action{font-size:11px;color:var(--ink4)}
-.flag-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;margin-right:6px;margin-bottom:2px}
-.tag-red{background:var(--red-bg);color:var(--red-txt)}
-.tag-amber{background:var(--amber-bg);color:var(--amber-txt)}
-
-/* ── QUALITATIVE FEEDBACK (EXCEL) ── */
-.qf-card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:1rem 1.2rem;margin-bottom:8px}
-.qf-label{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600;margin-bottom:4px}
-.qf-body{font-size:12px;color:var(--ink2);line-height:1.6}
+.flag-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;margin-right:5px}
+.tag-red{background:var(--red-bg);color:var(--red-dark)}
+.tag-amber{background:var(--amber-bg);color:var(--amber-dark)}
 
 /* ── FUTURE DOMAINS ── */
-.future{background:var(--surface);border:1px dashed var(--rule);border-radius:12px;padding:1.25rem 1.4rem;margin-bottom:1.5rem}
-.future-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink3);margin-bottom:.75rem}
-.future-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.fd-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:.9rem 1rem}
-.fd-letter{font-size:20px;font-weight:700;color:var(--rule);font-family:'DM Serif Display',Georgia,serif;float:right;line-height:1}
-.fd-domain{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);font-weight:600;margin-bottom:4px}
-.fd-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.future-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.fd-card{background:var(--white);border:1px dashed var(--rule);border-radius:var(--card-r);padding:1.2rem;box-shadow:var(--shadow)}
+.fd-letter{font-size:36px;font-weight:700;color:var(--rule);font-family:'DM Serif Display',Georgia,serif;float:right;line-height:1;margin-left:8px}
+.fd-domain{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);font-weight:600;margin-bottom:3px}
+.fd-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
 .fd-body{font-size:11px;color:var(--ink3);line-height:1.6}
 
-/* ── LEADERSHIP INSIGHT COLUMN ── */
-.insight{font-size:11px;color:var(--teal);font-style:italic;line-height:1.5;margin-top:5px;padding-left:8px;border-left:2px solid #99F6E4}
+/* ── TOOLTIP ── */
+.tooltip{position:fixed;z-index:999;background:var(--ink);color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;pointer-events:none;max-width:220px;line-height:1.5;opacity:0;transition:opacity .15s;white-space:normal}
+
+/* ── PROGRESS RINGS ── */
+.rings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ring-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.2rem;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:var(--shadow);transition:.2s}
+.ring-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.ring-wrap{position:relative;width:90px;height:90px;margin-bottom:.75rem}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-val{font-size:18px;font-weight:700;color:var(--ink)}
+.ring-unit{font-size:10px;color:var(--ink3)}
+.ring-name{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.ring-sub{font-size:10px;color:var(--ink4)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;padding:1rem}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--white);border-radius:16px;padding:2rem;max-width:520px;width:100%;box-shadow:var(--shadow-lg);transform:translateY(20px);transition:transform .25s;max-height:80vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-close{float:right;font-size:20px;cursor:pointer;color:var(--ink3);line-height:1;background:none;border:none;padding:2px}
+.modal-tag{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--green-bg);color:var(--green-dark);margin-bottom:.75rem}
+.modal-title{font-size:18px;font-weight:600;color:var(--ink);margin-bottom:.5rem;clear:right}
+.modal-sub{font-size:12px;color:var(--ink3);margin-bottom:1.25rem}
+.modal-body{font-size:13px;color:var(--ink2);line-height:1.7}
+.modal-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--rule);font-size:12px}
+.modal-row:last-child{border-bottom:none}
+.modal-row .label{color:var(--ink3)}
+.modal-row .val{font-weight:600;color:var(--ink)}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:6px;margin-bottom:1.25rem;background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:4px;box-shadow:var(--shadow)}
+.tab-btn{flex:1;font-size:12px;font-weight:500;color:var(--ink3);padding:7px 10px;border-radius:7px;cursor:pointer;border:none;background:none;transition:.2s;text-align:center}
+.tab-btn.active{background:var(--ink);color:#fff;font-weight:600}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-btn{font-size:11px;font-weight:500;color:var(--ink3);padding:5px 12px;border-radius:99px;cursor:pointer;border:1px solid var(--rule);background:var(--white);transition:.2s}
+.filter-btn:hover,.filter-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 
 /* ── FOOTER ── */
-.footer{border-top:1px solid var(--rule);padding-top:1rem;margin-top:2rem;display:flex;justify-content:space-between;font-size:11px;color:var(--ink4);flex-wrap:wrap;gap:4px}
+footer{border-top:1px solid var(--rule);padding:1.25rem 0;margin-top:2rem;display:flex;justify-content:space-between;font-size:11px;color:var(--ink4);flex-wrap:wrap;gap:6px}
 
-@media(max-width:700px){
-  .five-q-grid,.kpi-row,.two-col,.three-col,.capture-q-grid,.future-grid{grid-template-columns:1fr}
-  .masthead{grid-template-columns:1fr}
-  .masthead-right{text-align:left}
+/* ── BACK-TO-TOP ── */
+.btt{position:fixed;bottom:2rem;right:2rem;width:40px;height:40px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);z-index:50;opacity:0;pointer-events:none;transition:.25s;border:none;font-size:16px}
+.btt.show{opacity:1;pointer-events:all}
+
+/* ── ANIM ── */
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  .charts-row{grid-template-columns:1fr}
+  .fq-grid{grid-template-columns:1fr 1fr}
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .ind-grid,.qual-grid{grid-template-columns:1fr}
+  .planner-grid{grid-template-columns:1fr 1fr}
+  .capture-grid{grid-template-columns:repeat(2,1fr)}
+  .future-grid{grid-template-columns:1fr}
+  .rings-row{grid-template-columns:1fr 1fr}
+  .hero{grid-template-columns:1fr}
+  .hero-right{align-items:flex-start}
+}
+@media(max-width:600px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .planner-grid{grid-template-columns:1fr}
+  .fq-grid{grid-template-columns:1fr}
+  .rings-row{grid-template-columns:1fr}
+  .hero-title{font-size:26px}
+  nav{padding:0 1rem}
 }
 </style>
 </head>
 <body>
+
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">TLC <span>Progress</span></span>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="scrollTo('#overview')">Overview</button>
+    <button class="nav-link" onclick="scrollTo('#kpis')">KPIs</button>
+    <button class="nav-link" onclick="scrollTo('#quant')">Quantitative</button>
+    <button class="nav-link" onclick="scrollTo('#qual')">Qualitative</button>
+    <button class="nav-link" onclick="scrollTo('#sessions')">Sessions</button>
+    <button class="nav-link" onclick="scrollTo('#planner')">Planner</button>
+    <button class="nav-link" onclick="scrollTo('#stories')">Stories</button>
+    <button class="nav-link" onclick="scrollTo('#risks')">Risks</button>
+    <button class="nav-link" onclick="scrollTo('#future')">Future</button>
+  </div>
+  <span class="nav-period"><span class="live-dot"></span>Q1 2026 · On Track</span>
+</nav>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <span class="modal-tag" id="modal-tag">Offering</span>
+    <h3 class="modal-title" id="modal-title"></h3>
+    <p class="modal-sub" id="modal-sub"></p>
+    <div id="modal-rows"></div>
+  </div>
+</div>
+
+<!-- BACK TO TOP -->
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
 <div class="wrap">
 
-<!-- MASTHEAD -->
-<div class="masthead">
-  <div>
-    <p class="masthead-org">The Leader Collective</p>
-    <h1 class="masthead-title">Progress Review Dashboard</h1>
-    <p class="masthead-sub">Prepared by Charles Bin Atelu, Community Engagement Specialist, The Leader Collective</p>
-  </div>
-  <div class="masthead-right">
-    <div class="status-pill"><span class="pulse"></span> Platform on track</div>
-    <p class="period-tag">Q1 2026 · TLC Health Rating: 🟢 On Track</p>
-  </div>
-</div>
-
-<!-- FIVE QUESTIONS -->
-<div class="five-q">
-  <p class="five-q-label">Dashboard purpose — five questions this dashboard answers</p>
-  <div class="five-q-grid">
-    <div class="fq"><p class="fq-num">Q1</p><p class="fq-txt">Are members participating?</p></div>
-    <div class="fq"><p class="fq-num">Q2</p><p class="fq-txt">Are they finding value?</p></div>
-    <div class="fq"><p class="fq-num">Q3</p><p class="fq-txt">Are they applying what they learn?</p></div>
-    <div class="fq"><p class="fq-num">Q4</p><p class="fq-txt">Are they learning from one another?</p></div>
-    <div class="fq"><p class="fq-num">Q5</p><p class="fq-txt">Is the Collective contributing to broader organisational strengthening?</p></div>
-  </div>
-</div>
-
-<!-- TOP KPI CARDS -->
-<div class="section-head"><h2>Top-line indicators</h2></div>
-<div class="kpi-row">
-  <div class="kpi amber">
-    <p class="kpi-label">Active partners engaged</p>
-    <p class="kpi-val">71<sup>%</sup></p>
-    <p class="kpi-target">Target: 80% by end Q2</p>
-    <span class="kpi-badge amber">Near target</span>
-  </div>
-  <div class="kpi red">
-    <p class="kpi-label">General members onboarded</p>
-    <p class="kpi-val">12</p>
-    <p class="kpi-target">Target: 30</p>
-    <span class="kpi-badge red">Below target</span>
-  </div>
-  <div class="kpi green">
-    <p class="kpi-val">4.2<sup>/5</sup></p>
-    <p class="kpi-label">Avg. satisfaction rating</p>
-    <p class="kpi-target">Target: 4.0+ · n=89</p>
-    <span class="kpi-badge green">Above target</span>
-  </div>
-  <div class="kpi green">
-    <p class="kpi-val">82<sup>%</sup></p>
-    <p class="kpi-label">Would recommend TLC</p>
-    <p class="kpi-target">Target: 80%</p>
-    <span class="kpi-badge green">Above target</span>
-  </div>
-  <div class="kpi amber">
-    <p class="kpi-val">68<sup>%</sup></p>
-    <p class="kpi-label">Applied learning to practice</p>
-    <p class="kpi-target">Target: 70% (illustrative)</p>
-    <span class="kpi-badge amber">Near target</span>
-  </div>
-  <div class="kpi amber">
-    <p class="kpi-val">22<sup>%</sup></p>
-    <p class="kpi-label">Offerings with member-led element</p>
-    <p class="kpi-target">Target: 40% by year end</p>
-    <span class="kpi-badge amber">Below target</span>
-  </div>
-</div>
-
-<!-- QUANTITATIVE INDICATORS -->
-<div class="section-head"><h2>Quantitative indicators (6) — what the numbers show</h2></div>
-<div class="two-col">
-
-  <!-- Membership & Participation -->
-  <div class="card">
-    <p class="card-domain">Membership &amp; Participation</p>
-    <p class="card-title">Partner &amp; member engagement</p>
-    <div class="ind-row">
-      <div class="ind-name"><span>Active partners engaged</span><span>34/48 (71%)</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:89%"></div></div>
-      <div class="ind-meta"><span>Target: 80%</span><span>14 not yet engaged</span></div>
-      <p class="insight">Continue targeted outreach to inactive partners.</p>
+<!-- ── HERO ── -->
+<section id="overview">
+  <div class="hero">
+    <div>
+      <p class="hero-eyebrow">The Leader Collective · Platform Manager Report</p>
+      <h1 class="hero-title">Progress Review<br><em>Dashboard</em></h1>
+      <p class="hero-sub">A data-informed view of TLC's platform health, member participation, learning outcomes, and organisational contribution — Q1 2026.</p>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>General members onboarded</span><span>12 / 30</span></div>
-      <div class="bar-track"><div class="bar-fill red" style="width:40%"></div></div>
-      <div class="ind-meta"><span>Target: 30</span><span>40% of target</span></div>
-      <p class="insight">Review onboarding process and welcome communication.</p>
+    <div class="hero-right">
+      <div class="status-badge"><span class="live-dot"></span> Platform on track</div>
+      <div class="author-chip"><span class="author-avatar">CA</span>Charles Bin Atelu, Community Engagement Specialists, The Leader Collective</div>
+      <span class="hero-meta">Q1 2026 · Figures illustrative</span>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Alumni participation</span><span>18 / 20</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:90%"></div></div>
-      <div class="ind-meta"><span>Target: 20</span></div>
-      <p class="insight">Alumni outreach is showing positive results.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Average session attendance</span><span>52</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:80%"></div></div>
-      <div class="ind-meta"><span>Target: 50</span><span>On track</span></div>
-      <p class="insight">Participation remains steady across offerings.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Repeat participation rate</span><span>65%</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:93%"></div></div>
-      <div class="ind-meta"><span>Target: 70%</span></div>
-      <p class="insight">Encourage follow-up engagement and peer connections.</p>
-    </div>
-    <p class="dq">Decision question: Are we retaining members, and are members moving from one-time participants into active contributors? (Domain F – Retention and Continuity)</p>
   </div>
 
-  <!-- Learning Offerings -->
-  <div class="card">
-    <p class="card-domain">Learning Offerings</p>
-    <p class="card-title">Programme delivery status</p>
-    <div class="ind-row">
-      <div class="ind-name"><span>Sessions planned (annual)</span><span>9 / 9</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div>
-      <div class="ind-meta"><span>On plan</span></div>
-      <p class="insight">Delivery remains aligned with annual plan.</p>
+  <!-- FIVE QUESTIONS -->
+  <div class="five-q fade-in">
+    <p class="fq-label">Five questions this dashboard answers</p>
+    <div class="fq-grid">
+      <div class="fq-card"><p class="fq-num">Q1</p><p class="fq-txt">Are members participating?</p></div>
+      <div class="fq-card"><p class="fq-num">Q2</p><p class="fq-txt">Are they finding value?</p></div>
+      <div class="fq-card"><p class="fq-num">Q3</p><p class="fq-txt">Are they applying what they learn?</p></div>
+      <div class="fq-card"><p class="fq-num">Q4</p><p class="fq-txt">Are they learning from one another?</p></div>
+      <div class="fq-card"><p class="fq-num">Q5</p><p class="fq-txt">Is the Collective contributing to broader organisational strengthening?</p></div>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Sessions delivered (YTD)</span><span>2 / 2</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div>
-      <div class="ind-meta"><span>Q1 target met</span></div>
-      <p class="insight">Programme implementation is on track.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Sessions delivered as scheduled</span><span>1 / 1</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div>
-      <div class="ind-meta"><span>Strong coordination</span></div>
-      <p class="insight">Strong operational coordination.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Upcoming sessions confirmed</span><span>2 / 2</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div>
-      <div class="ind-meta"><span>Q2 on schedule</span></div>
-      <p class="insight">Maintain proactive facilitator engagement.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Member experience — onboarding satisfaction</span><span>3.8/5</span></div>
-      <div class="bar-track"><div class="bar-fill red" style="width:76%"></div></div>
-      <div class="ind-meta"><span>Target: 4.0</span></div>
-      <p class="insight">Strengthen orientation for new members.</p>
-    </div>
-    <p class="dq">Decision question: Are members participating at the level the calendar was designed for?</p>
   </div>
-</div>
+</section>
 
-<div class="two-col">
-  <!-- Member Experience -->
-  <div class="card">
-    <p class="card-domain">Member Experience</p>
-    <p class="card-title">Value &amp; satisfaction</p>
-    <div class="ind-row">
-      <div class="ind-name"><span>Average satisfaction rating</span><span>4.2 / 5</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:84%"></div></div>
-      <div class="ind-meta"><span>Target: 4.0+</span><span>n=89</span></div>
-      <p class="insight">Members value the quality of sessions.</p>
+<!-- ── KPIs ── -->
+<section id="kpis">
+  <div class="section-hd"><h2>Top-line indicators</h2><span class="count-pill">6</span></div>
+  <div class="kpi-grid fade-in">
+    <div class="kpi amber" data-tip="14 partners not yet engaged. Personal outreach underway by 30 April.">
+      <p class="kpi-label">Active partners engaged</p>
+      <p class="kpi-val">71<sup>%</sup></p>
+      <p class="kpi-target">Target: 80% by end Q2</p>
+      <span class="kpi-badge amber">Near target</span>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Content relevance score</span><span>78%</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:85%"></div></div>
-      <div class="ind-meta"><span>Target: 75%</span></div>
-      <p class="insight">Topics align with organizational needs.</p>
+    <div class="kpi red" data-tip="12 of 30 General Members onboarded. Onboarding sequence under review.">
+      <p class="kpi-label">General members onboarded</p>
+      <p class="kpi-val">12</p>
+      <p class="kpi-target">Target: 30</p>
+      <span class="kpi-badge red">Below target</span>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Members willing to recommend TLC</span><span>82%</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:82%"></div></div>
-      <div class="ind-meta"><span>Target: 80%</span></div>
-      <p class="insight">Positive member advocacy is emerging.</p>
+    <div class="kpi green" data-tip="n=89 responses across Q1 sessions. Target: 4.0+.">
+      <p class="kpi-label">Avg. satisfaction rating</p>
+      <p class="kpi-val">4.2<sup>/5</sup></p>
+      <p class="kpi-target">Target: 4.0+ · n=89</p>
+      <span class="kpi-badge green">Above target</span>
     </div>
-    <p class="dq">Decision question: Are members finding value in the offerings delivered so far?</p>
+    <div class="kpi green" data-tip="82% of members would recommend TLC to a peer organisation.">
+      <p class="kpi-label">Would recommend TLC</p>
+      <p class="kpi-val">82<sup>%</sup></p>
+      <p class="kpi-target">Target: 80%</p>
+      <span class="kpi-badge green">Above target</span>
+    </div>
+    <div class="kpi amber" data-tip="60–90 day follow-up survey illustrative figure. Formal surveys to be issued per session.">
+      <p class="kpi-label">Applied learning to practice</p>
+      <p class="kpi-val">68<sup>%</sup></p>
+      <p class="kpi-target">Target: 70% (illustrative)</p>
+      <span class="kpi-badge amber">Near target</span>
+    </div>
+    <div class="kpi amber" data-tip="2 of 9 annual offerings feature a member-led element. Target: 40% by year end.">
+      <p class="kpi-label">Offerings with member-led element</p>
+      <p class="kpi-val">22<sup>%</sup></p>
+      <p class="kpi-target">Target: 40% by year end</p>
+      <span class="kpi-badge amber">Below target</span>
+    </div>
   </div>
+</section>
 
-  <!-- Peer Learning -->
-  <div class="card">
-    <p class="card-domain">Peer Learning &amp; Ownership</p>
-    <p class="card-title">Member-led contribution</p>
-    <div class="ind-row">
-      <div class="ind-name"><span>Member-led sessions</span><span>1 / 3</span></div>
-      <div class="bar-track"><div class="bar-fill red" style="width:33%"></div></div>
-      <div class="ind-meta"><span>Target: 3</span></div>
-      <p class="insight">Increase opportunities for member facilitation.</p>
+<!-- ── CHARTS ── -->
+<section>
+  <div class="section-hd"><h2>Visual analytics</h2></div>
+  <div class="charts-row fade-in">
+    <!-- Radar chart -->
+    <div class="chart-card">
+      <p class="chart-domain">Multi-domain</p>
+      <p class="chart-title">Domain health overview (% of target)</p>
+      <canvas id="radarChart"></canvas>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Member spotlights conducted</span><span>2 / 4</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:50%"></div></div>
-      <div class="ind-meta"><span>Target: 4</span></div>
-      <p class="insight">Continue showcasing partner expertise.</p>
+    <!-- Donut: partner engagement -->
+    <div class="chart-card">
+      <p class="chart-domain">Membership & Participation</p>
+      <p class="chart-title">Partner engagement breakdown</p>
+      <canvas id="donutChart"></canvas>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Peer discussions facilitated</span><span>4 / 6</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:67%"></div></div>
-      <div class="ind-meta"><span>Target: 6</span></div>
-      <p class="insight">Encourage more exchange between members.</p>
+    <!-- Bar: satisfaction -->
+    <div class="chart-card">
+      <p class="chart-domain">Member Experience</p>
+      <p class="chart-title">Satisfaction vs. target (Q1)</p>
+      <canvas id="barChart"></canvas>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Member-generated resources shared</span><span>3 / 5</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:60%"></div></div>
-      <div class="ind-meta"><span>Target: 5</span></div>
-      <p class="insight">Promote community contribution pathways.</p>
-    </div>
-    <p class="dq">Decision question: Are members teaching one another, and are African organisations being recognised as knowledge holders? (Domain G – Peer Learning and Member Contribution)</p>
-  </div>
-</div>
-
-<div class="two-col">
-  <!-- Org Strengthening -->
-  <div class="card">
-    <p class="card-domain">Organisational Strengthening Outcomes</p>
-    <p class="card-title">Practice change &amp; collaboration</p>
-    <div class="ind-row">
-      <div class="ind-name"><span>Members reporting application of learning</span><span>68%</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:97%"></div></div>
-      <div class="ind-meta"><span>Target: 70% (illustrative — 60–90 day follow-up)</span></div>
-      <p class="insight">Learning is translating into practice.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Organisations adopting shared tools</span><span>10 / 15</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:67%"></div></div>
-      <div class="ind-meta"><span>Target: 15</span></div>
-      <p class="insight">Capture and share implementation stories.</p>
-    </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Cross-org collaborations initiated</span><span>4 / 6</span></div>
-      <div class="bar-track"><div class="bar-fill amber" style="width:67%"></div></div>
-      <div class="ind-meta"><span>Target: 6</span></div>
-      <p class="insight">Facilitate connections between members.</p>
-    </div>
-    <p class="dq">Decision question: Is TLC supporting Blood:Water's organisational strengthening goals, and are partner priorities shaping the agenda? (Domain L – Organisational Strengthening Contribution)</p>
   </div>
 
-  <!-- Accessibility -->
-  <div class="card">
-    <p class="card-domain">Accessibility &amp; Inclusion</p>
-    <p class="card-title">Reach &amp; equity</p>
-    <div class="ind-row">
-      <div class="ind-name"><span>Countries represented in offerings</span><span>9 / 10</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:90%"></div></div>
-      <div class="ind-meta"><span>Target: 10</span></div>
-      <p class="insight">Expand participation across regions.</p>
+  <!-- Progress rings -->
+  <div class="rings-row fade-in">
+    <div class="ring-card">
+      <div class="ring-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="38" fill="none" stroke="#E8E4DF" stroke-width="8"/><circle cx="45" cy="45" r="38" fill="none" stroke="#16A34A" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="67.33" stroke-linecap="round"/></svg><div class="ring-label"><span class="ring-val">71<span style="font-size:11px">%</span></span></div></div>
+      <p class="ring-name">Active partners</p><p class="ring-sub">Target 80% · 34/48</p>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Session recordings shared</span><span>1 / 1</span></div>
-      <div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div>
-      <div class="ind-meta"><span>Target: 1</span></div>
-      <p class="insight">Continue supporting asynchronous learning.</p>
+    <div class="ring-card">
+      <div class="ring-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="38" fill="none" stroke="#E8E4DF" stroke-width="8"/><circle cx="45" cy="45" r="38" fill="none" stroke="#DC2626" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="143.26" stroke-linecap="round"/></svg><div class="ring-label"><span class="ring-val">40<span style="font-size:11px">%</span></span></div></div>
+      <p class="ring-name">Members onboarded</p><p class="ring-sub">Target 30 · 12 done</p>
     </div>
-    <div class="ind-row">
-      <div class="ind-name"><span>Members reporting connectivity challenges</span><span>12%</span></div>
-      <div class="bar-track"><div class="bar-fill red" style="width:80%"></div></div>
-      <div class="ind-meta"><span>Target: &lt;10%</span><span>3 CSOs in rural border of Northeastern</span></div>
-      <p class="insight">Explore low-bandwidth engagement options.</p>
+    <div class="ring-card">
+      <div class="ring-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="38" fill="none" stroke="#E8E4DF" stroke-width="8"/><circle cx="45" cy="45" r="38" fill="none" stroke="#D97706" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="76.4" stroke-linecap="round"/></svg><div class="ring-label"><span class="ring-val">68<span style="font-size:11px">%</span></span></div></div>
+      <p class="ring-name">Applied learning</p><p class="ring-sub">Target 70% (illustrative)</p>
     </div>
-    <p class="dq">Decision question: Who is not participating, and are some groups benefiting more than others? (Domain I – Accessibility and Inclusion)</p>
-  </div>
-</div>
-
-<!-- SESSION DELIVERY TABLE -->
-<div class="section-head"><h2>Session delivery — Q1 2026</h2></div>
-<div class="card" style="padding:0;overflow:hidden;margin-bottom:1.5rem">
-  <table class="session-table">
-    <thead>
-      <tr>
-        <th>Session</th><th>Topic</th><th>Target audience</th><th>Reg. target</th><th>Actual reg.</th><th>Rating</th><th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>Financial Resilience Part 1</strong></td>
-        <td>Financial Resilience</td>
-        <td>Active partners + alumni</td>
-        <td>65</td>
-        <td><strong>61</strong></td>
-        <td>4.2/5</td>
-        <td><span class="s-pill s-delivered">Delivered</span></td>
-      </tr>
-      <tr>
-        <td><strong>Financial Resilience Part 2</strong></td>
-        <td>Financial Resilience</td>
-        <td>Active partners + alumni</td>
-        <td>65</td>
-        <td><strong>58</strong></td>
-        <td>4.2/5</td>
-        <td><span class="s-pill s-delivered">Delivered</span></td>
-      </tr>
-      <tr>
-        <td colspan="7" style="background:var(--surface);font-size:10px;color:var(--ink4);padding:6px 10px;letter-spacing:.06em;text-transform:uppercase">Combined n=89 responses across Q1 sessions</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- QUALITATIVE INDICATORS -->
-<div class="section-head"><h2>Qualitative indicators (6) — what the experience shows</h2></div>
-<div class="two-col">
-  <div class="qual-card">
-    <p class="card-domain">Member experience · Q1</p>
-    <p class="qual-title">Member voice</p>
-    <div class="quote-pull">"I applied the financial scenario exercise directly with my finance team the week after the session. For the first time we had a shared language for talking about reserves."<span class="quote-attr">— Beacon of Hope Finance team, Q1 2026</span></div>
-    <p class="dq">Decision question: Are members finding value in the offerings delivered so far?</p>
-  </div>
-  <div class="qual-card">
-    <p class="card-domain">Peer Learning &amp; Ownership · Domain G</p>
-    <p class="qual-title">Community shift in progress</p>
-    <p class="qual-body">Members in the Financial Resilience series requested a follow-up peer discussion space between sessions, indicating readiness to move from passive participation to active exchange. Two members offered to share their own reserve-building experience in session three. This is the shift from a platform for members to a community with members.</p>
-    <p class="dq">Decision question: Are members teaching one another? (Domain G – Peer Learning and Member Contribution)</p>
-  </div>
-  <div class="qual-card">
-    <p class="card-domain">Onboarding Effectiveness · Domain J</p>
-    <p class="qual-title">General member onboarding themes</p>
-    <p class="qual-body">First cohort flagged two consistent themes: (1) unclear expectations about what membership involves beyond attending sessions, and (2) limited sense of how their experience differs from active partners. Onboarding sequence is being revised to address both. Early signal: General Members who received a personal welcome call engaged at a higher rate in their first 30 days.</p>
-    <p class="dq">Decision question: Are onboarding pathways effective? (Domain J – Onboarding Effectiveness)</p>
-  </div>
-  <div class="qual-card">
-    <p class="card-domain">Accessibility &amp; Inclusion · Domain I</p>
-    <p class="qual-title">Connectivity &amp; inclusion signals</p>
-    <p class="qual-body">Connectivity issues reported by 12% of Q1 respondents, concentrated among 3 CSOs in rural border of Northeastern. Asynchronous access to session recordings mitigated some impact. Members in those geographies have been offered early access to session materials. Language and time zone considerations are being factored into Q2 scheduling.</p>
-    <p class="dq">Decision question: Who is not participating, and are some groups benefiting more than others? (Domain I – Accessibility and Inclusion)</p>
-  </div>
-  <div class="qual-card">
-    <p class="card-domain">Organisational Strengthening · Domain L</p>
-    <p class="qual-title">Early practice change signals</p>
-    <p class="qual-body">Three active partners reported that Q1 content directly informed an internal process or decision: one is developing an operating reserve policy; one revised its M&amp;E reporting template using frameworks shared in pre-session materials; one cited TLC content in a funding proposal submitted in March 2026. These are early signals of TLC contributing to organisational practice, not just knowledge.</p>
-    <p class="dq">Decision question: Is TLC supporting Blood:Water's organisational strengthening goals? (Domain L)</p>
-  </div>
-  <div class="qual-card">
-    <p class="card-domain">Community Health &amp; Culture · Domain K</p>
-    <p class="qual-title">Positive culture signals</p>
-    <p class="qual-body">Facilitator and platform manager observations across Q1 sessions indicate high levels of candour in discussion, including members sharing resource constraints and programme failures. No moderation incidents recorded. Members are engaging with each other, not only with the facilitator. This is a positive early signal that the community-of-practice culture is taking root.</p>
-    <p class="dq">Decision question: Do members feel safe contributing, and are Community Guidelines being lived out? (Domain K – Community Health and Culture)</p>
-  </div>
-</div>
-
-<!-- QUALITATIVE FEEDBACK FROM EXCEL -->
-<div class="section-head"><h2>Qualitative feedback — member voice &amp; emerging needs</h2></div>
-<div class="three-col" style="margin-bottom:1.5rem">
-  <div class="qf-card">
-    <p class="qf-label">Member voice</p>
-    <p class="qf-body">"I applied the financial scenario exercise directly with my finance team." — Evidence of immediate application of learning.</p>
-  </div>
-  <div class="qf-card">
-    <p class="qf-label">Key learning this period</p>
-    <p class="qf-body">New members need clearer orientation to TLC offerings and expectations. Action: simplify onboarding and pre-session communication.</p>
-  </div>
-  <div class="qf-card">
-    <p class="qf-label">Emerging member needs</p>
-    <p class="qf-body">Demand for shorter sessions and post-event discussion spaces. Action: adapt future offerings accordingly.</p>
-  </div>
-</div>
-
-<!-- STORIES OF CHANGE -->
-<div class="stories">
-  <p class="stories-label">Stories of change — permanent section, refreshed each quarter</p>
-  <p class="stories-title">Q1 2026 entry — Beacon of Hope Finance team adopts scenario planning tool</p>
-  <p class="stories-body">Following the Financial Resilience series, the Beacon of Hope Finance team adopted a shared scenario-planning tool with their board — the first step toward a formal operating reserve policy. (Linked to Q7 and Q11 member feedback above.)</p>
-  <div class="stories-capture">
-    <p class="stories-capture-label">Capture questions for each quarter</p>
-    <div class="capture-q-grid">
-      <div class="cq">What changed because of TLC?</div>
-      <div class="cq">What practice did a member adopt?</div>
-      <div class="cq">What challenge was overcome?</div>
-      <div class="cq">What partnership emerged?</div>
-      <div class="cq">What lesson surprised us?</div>
+    <div class="ring-card">
+      <div class="ring-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="38" fill="none" stroke="#E8E4DF" stroke-width="8"/><circle cx="45" cy="45" r="38" fill="none" stroke="#16A34A" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="42.98" stroke-linecap="round"/></svg><div class="ring-label"><span class="ring-val">82<span style="font-size:11px">%</span></span></div></div>
+      <p class="ring-name">Recommend TLC</p><p class="ring-sub">Target 80%</p>
+    </div>
+    <div class="ring-card">
+      <div class="ring-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="38" fill="none" stroke="#E8E4DF" stroke-width="8"/><circle cx="45" cy="45" r="38" fill="none" stroke="#16A34A" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="47.75" stroke-linecap="round"/></svg><div class="ring-label"><span class="ring-val">90<span style="font-size:11px">%</span></span></div></div>
+      <p class="ring-name">Alumni engaged</p><p class="ring-sub">Target 20 · 18 done</p>
+    </div>
+    <div class="ring-card">
+      <div class="ring-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="38" fill="none" stroke="#E8E4DF" stroke-width="8"/><circle cx="45" cy="45" r="38" fill="none" stroke="#16A34A" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="0" stroke-linecap="round"/></svg><div class="ring-label"><span class="ring-val">100<span style="font-size:10px">%</span></span></div></div>
+      <p class="ring-name">Sessions delivered</p><p class="ring-sub">Target 2 · 2 done</p>
     </div>
   </div>
-</div>
+</section>
 
-<!-- RISKS -->
-<div class="section-head"><h2>Risks &amp; attention points</h2></div>
-<div class="flag">
-  <div class="flag-icon flag-red">⚠️</div>
-  <div>
-    <p class="flag-title"><span class="flag-tag tag-red">FLAG</span>Open Issue 1 — Unengaged active partners</p>
-    <p class="flag-body">14 of 48 active partners have not yet engaged in any 2026 offering. Personal outreach underway.</p>
-    <p class="flag-action">Owner: CB Atelu · Action: Personal outreach by 30 April · Target resolution: Q2 week 2</p>
-  </div>
-</div>
-<div class="flag">
-  <div class="flag-icon flag-red">⚠️</div>
-  <div>
-    <p class="flag-title"><span class="flag-tag tag-red">FLAG</span>Open Issue 2 — General member onboarding pace</p>
-    <p class="flag-body">Onboarding running at 40% of Q2 target (12 of 30). Onboarding sequence under review based on first cohort experience.</p>
-    <p class="flag-action">Owner: CB Atelu + OS Coordinator · Action: Revised sequence and welcome communication by end of May</p>
-  </div>
-</div>
-<div class="flag">
-  <div class="flag-icon flag-amber">🕐</div>
-  <div>
-    <p class="flag-title"><span class="flag-tag tag-amber">RISK</span>AI &amp; Digital Tools Workshop — low sign-up risk</p>
-    <p class="flag-body">Registration not yet open for Q2 May workshop. Risk of low uptake if promoted too late. Current risk level: Moderate. Target: Low.</p>
-    <p class="flag-action">Recommendation: Begin promotion no later than first week of April · Leverage member champions</p>
-  </div>
-</div>
-<div class="flag">
-  <div class="flag-icon flag-amber">📡</div>
-  <div>
-    <p class="flag-title"><span class="flag-tag tag-amber">RISK</span>Connectivity barriers affecting participation</p>
-    <p class="flag-body">12% of members reporting connectivity challenges, concentrated in 3 CSOs in rural border of Northeastern. Target: &lt;10%.</p>
-    <p class="flag-action">Action: Continue providing recordings and summaries · Explore low-bandwidth engagement options</p>
-  </div>
-</div>
+<!-- ── QUANTITATIVE INDICATORS ── -->
+<section id="quant">
+  <div class="section-hd"><h2>Quantitative indicators (6)</h2><span class="count-pill">What the numbers show</span></div>
 
-<!-- FUTURE DOMAINS -->
-<div style="margin-top:1.5rem">
-<div class="section-head"><h2>Additional thematic domains — noted for future development</h2></div>
-<div class="future">
-  <p class="future-label">Three domains not yet reflected in the 12-indicator dashboard — flagged for Africa Partnerships team consideration</p>
-  <div class="future-grid">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('tab-membership',this)">Membership &amp; Participation</button>
+    <button class="tab-btn" onclick="showTab('tab-learning',this)">Learning Offerings</button>
+    <button class="tab-btn" onclick="showTab('tab-experience',this)">Member Experience</button>
+    <button class="tab-btn" onclick="showTab('tab-peer',this)">Peer Learning</button>
+    <button class="tab-btn" onclick="showTab('tab-org',this)">Org Strengthening</button>
+    <button class="tab-btn" onclick="showTab('tab-access',this)">Accessibility</button>
+  </div>
+
+  <div id="tab-membership" class="tab-pane active">
+    <div class="ind-grid fade-in">
+      <div class="ind-card">
+        <p class="ind-card-domain">Membership &amp; Participation</p>
+        <p class="ind-card-title">Partner &amp; member engagement</p>
+        <div class="ind-row">
+          <div class="ind-name"><span>Active partners engaged</span><span>34/48 (71%)</span></div>
+          <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="88.75"></div></div>
+          <div class="ind-meta"><span>Target: 80%</span><span>14 not yet engaged</span></div>
+          <p class="insight">Continue targeted outreach to inactive partners.</p>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name"><span>General members onboarded</span><span>12 / 30</span></div>
+          <div class="bar-track"><div class="bar-fill red" style="width:0" data-w="40"></div></div>
+          <div class="ind-meta"><span>Target: 30</span><span>40% of target</span></div>
+          <p class="insight">Review onboarding process and welcome communication.</p>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name"><span>Alumni participation</span><span>18 / 20</span></div>
+          <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="90"></div></div>
+          <div class="ind-meta"><span>Target: 20</span></div>
+          <p class="insight">Alumni outreach is showing positive results.</p>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name"><span>Avg. session attendance</span><span>52</span></div>
+          <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="80"></div></div>
+          <div class="ind-meta"><span>Target: 50</span><span>On track</span></div>
+          <p class="insight">Participation remains steady across offerings.</p>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name"><span>Repeat participation rate</span><span>65%</span></div>
+          <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="93"></div></div>
+          <div class="ind-meta"><span>Target: 70%</span></div>
+          <p class="insight">Encourage follow-up engagement and peer connections.</p>
+        </div>
+        <p class="dq">Decision question: Are we retaining members, and are members moving from one-time participants into active contributors? (Domain F – Retention and Continuity)</p>
+      </div>
+      <div class="ind-card" style="background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:1rem">
+        <canvas id="membershipBar" style="max-height:260px;max-width:100%"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-learning" class="tab-pane">
+    <div class="ind-card">
+      <p class="ind-card-domain">Learning Offerings</p>
+      <p class="ind-card-title">Programme delivery status</p>
+      <div class="ind-row">
+        <div class="ind-name"><span>Sessions planned (annual)</span><span>9 / 9</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="100"></div></div>
+        <div class="ind-meta"><span>On plan</span></div>
+        <p class="insight">Delivery remains aligned with annual plan.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Sessions delivered (YTD)</span><span>2 / 2</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="100"></div></div>
+        <div class="ind-meta"><span>Q1 target met</span></div>
+        <p class="insight">Programme implementation is on track.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Sessions delivered as scheduled</span><span>1 / 1</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="100"></div></div>
+        <div class="ind-meta"><span>Strong coordination</span></div>
+        <p class="insight">Strong operational coordination.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Upcoming sessions confirmed</span><span>2 / 2</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="100"></div></div>
+        <div class="ind-meta"><span>Q2 on schedule</span></div>
+        <p class="insight">Maintain proactive facilitator engagement.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Onboarding satisfaction</span><span>3.8 / 5</span></div>
+        <div class="bar-track"><div class="bar-fill red" style="width:0" data-w="76"></div></div>
+        <div class="ind-meta"><span>Target: 4.0</span></div>
+        <p class="insight">Strengthen orientation for new members.</p>
+      </div>
+      <p class="dq">Decision question: Are members participating at the level the calendar was designed for?</p>
+    </div>
+  </div>
+
+  <div id="tab-experience" class="tab-pane">
+    <div class="ind-card">
+      <p class="ind-card-domain">Member Experience</p>
+      <p class="ind-card-title">Value &amp; satisfaction</p>
+      <div class="ind-row">
+        <div class="ind-name"><span>Avg. satisfaction rating</span><span>4.2 / 5</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="84"></div></div>
+        <div class="ind-meta"><span>Target: 4.0+</span><span>n=89</span></div>
+        <p class="insight">Members value the quality of sessions.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Content relevance score</span><span>78%</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="85"></div></div>
+        <div class="ind-meta"><span>Target: 75%</span></div>
+        <p class="insight">Topics align with organisational needs.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Members willing to recommend TLC</span><span>82%</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="82"></div></div>
+        <div class="ind-meta"><span>Target: 80%</span></div>
+        <p class="insight">Positive member advocacy is emerging.</p>
+      </div>
+      <p class="dq">Decision question: Are members finding value in the offerings delivered so far?</p>
+    </div>
+  </div>
+
+  <div id="tab-peer" class="tab-pane">
+    <div class="ind-card">
+      <p class="ind-card-domain">Peer Learning &amp; Ownership</p>
+      <p class="ind-card-title">Member-led contribution</p>
+      <div class="ind-row">
+        <div class="ind-name"><span>Member-led sessions</span><span>1 / 3</span></div>
+        <div class="bar-track"><div class="bar-fill red" style="width:0" data-w="33"></div></div>
+        <div class="ind-meta"><span>Target: 3</span></div>
+        <p class="insight">Increase opportunities for member facilitation.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Member spotlights conducted</span><span>2 / 4</span></div>
+        <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="50"></div></div>
+        <div class="ind-meta"><span>Target: 4</span></div>
+        <p class="insight">Continue showcasing partner expertise.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Peer discussions facilitated</span><span>4 / 6</span></div>
+        <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="67"></div></div>
+        <div class="ind-meta"><span>Target: 6</span></div>
+        <p class="insight">Encourage more exchange between members.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Member-generated resources shared</span><span>3 / 5</span></div>
+        <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="60"></div></div>
+        <div class="ind-meta"><span>Target: 5</span></div>
+        <p class="insight">Promote community contribution pathways.</p>
+      </div>
+      <p class="dq">Decision question: Are members teaching one another, and are African organisations being recognised as knowledge holders? (Domain G – Peer Learning and Member Contribution)</p>
+    </div>
+  </div>
+
+  <div id="tab-org" class="tab-pane">
+    <div class="ind-card">
+      <p class="ind-card-domain">Organisational Strengthening Outcomes</p>
+      <p class="ind-card-title">Practice change &amp; collaboration</p>
+      <div class="ind-row">
+        <div class="ind-name"><span>Members applying learning</span><span>68%</span></div>
+        <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="97"></div></div>
+        <div class="ind-meta"><span>Target: 70% (60–90 day follow-up)</span></div>
+        <p class="insight">Learning is translating into practice.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Orgs adopting shared tools</span><span>10 / 15</span></div>
+        <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="67"></div></div>
+        <div class="ind-meta"><span>Target: 15</span></div>
+        <p class="insight">Capture and share implementation stories.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Cross-org collaborations initiated</span><span>4 / 6</span></div>
+        <div class="bar-track"><div class="bar-fill amber" style="width:0" data-w="67"></div></div>
+        <div class="ind-meta"><span>Target: 6</span></div>
+        <p class="insight">Facilitate connections between members.</p>
+      </div>
+      <p class="dq">Decision question: Is TLC supporting Blood:Water's organisational strengthening goals, and are partner priorities shaping the agenda? (Domain L)</p>
+    </div>
+  </div>
+
+  <div id="tab-access" class="tab-pane">
+    <div class="ind-card">
+      <p class="ind-card-domain">Accessibility &amp; Inclusion</p>
+      <p class="ind-card-title">Reach &amp; equity</p>
+      <div class="ind-row">
+        <div class="ind-name"><span>Countries represented</span><span>9 / 10</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="90"></div></div>
+        <div class="ind-meta"><span>Target: 10</span></div>
+        <p class="insight">Expand participation across regions.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Session recordings shared</span><span>1 / 1</span></div>
+        <div class="bar-track"><div class="bar-fill green" style="width:0" data-w="100"></div></div>
+        <div class="ind-meta"><span>Target: 1</span></div>
+        <p class="insight">Continue supporting asynchronous learning.</p>
+      </div>
+      <div class="ind-row">
+        <div class="ind-name"><span>Members with connectivity challenges</span><span>12%</span></div>
+        <div class="bar-track"><div class="bar-fill red" style="width:0" data-w="80"></div></div>
+        <div class="ind-meta"><span>Target: &lt;10%</span><span>3 CSOs in rural border of Northeastern</span></div>
+        <p class="insight">Explore low-bandwidth engagement options.</p>
+      </div>
+      <p class="dq">Decision question: Who is not participating, and are some groups benefiting more than others? (Domain I – Accessibility and Inclusion)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── SESSION DELIVERY ── -->
+<section id="sessions">
+  <div class="section-hd"><h2>Session delivery — Q1 2026</h2></div>
+  <div class="table-card fade-in">
+    <table>
+      <thead>
+        <tr><th>Session</th><th>Topic</th><th>Audience</th><th>Reg. Target</th><th>Actual Reg.</th><th>Rating</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Financial Resilience Part 1</strong></td>
+          <td>Financial Resilience</td>
+          <td>Active partners + alumni</td>
+          <td>65</td>
+          <td><strong>61</strong></td>
+          <td>4.2/5</td>
+          <td><span class="s-pill s-delivered">Delivered</span></td>
+        </tr>
+        <tr>
+          <td><strong>Financial Resilience Part 2</strong></td>
+          <td>Financial Resilience</td>
+          <td>Active partners + alumni</td>
+          <td>65</td>
+          <td><strong>58</strong></td>
+          <td>4.2/5</td>
+          <td><span class="s-pill s-delivered">Delivered</span></td>
+        </tr>
+        <tr>
+          <td colspan="7" style="background:var(--bg);font-size:10px;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;padding:7px 14px">Combined n=89 responses across Q1 sessions</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── QUALITATIVE ── -->
+<section id="qual">
+  <div class="section-hd"><h2>Qualitative indicators (6)</h2><span class="count-pill">What the experience shows</span></div>
+  <div class="qual-grid fade-in">
+    <div class="qual-card">
+      <p class="qual-card-domain">Member Experience · Q1</p>
+      <p class="qual-card-title">Member voice</p>
+      <div class="quote-pull">"I applied the financial scenario exercise directly with my finance team the week after the session. For the first time we had a shared language for talking about reserves."<span class="quote-attr">— Active partner, Beacon of Hope, Q1 2026</span></div>
+      <p class="dq">Decision question: Are members finding value in the offerings delivered so far?</p>
+    </div>
+    <div class="qual-card">
+      <p class="qual-card-domain">Peer Learning &amp; Ownership · Domain G</p>
+      <p class="qual-card-title">Community shift in progress</p>
+      <p class="qual-body">Members in the Financial Resilience series requested a follow-up peer discussion space between sessions, indicating readiness to move from passive participation to active exchange. Two members offered to share their own reserve-building experience in session three. This is the shift from a platform <em>for</em> members to a community <em>with</em> members.</p>
+      <p class="dq">Decision question: Are members teaching one another? (Domain G)</p>
+    </div>
+    <div class="qual-card">
+      <p class="qual-card-domain">Onboarding Effectiveness · Domain J</p>
+      <p class="qual-card-title">General member onboarding themes</p>
+      <p class="qual-body">First cohort flagged two consistent themes: unclear expectations about what membership involves beyond attending sessions, and limited sense of how their experience differs from active partners. Early signal: General Members who received a personal welcome call engaged at a higher rate in their first 30 days.</p>
+      <p class="dq">Decision question: Are onboarding pathways effective? (Domain J)</p>
+    </div>
+    <div class="qual-card">
+      <p class="qual-card-domain">Accessibility &amp; Inclusion · Domain I</p>
+      <p class="qual-card-title">Connectivity &amp; inclusion signals</p>
+      <p class="qual-body">Connectivity issues reported by 12% of Q1 respondents, concentrated in three countries. Asynchronous access to session recordings mitigated some impact. Language and time zone considerations are being factored into Q2 scheduling.</p>
+      <p class="dq">Decision question: Who is not participating? (Domain I)</p>
+    </div>
+    <div class="qual-card">
+      <p class="qual-card-domain">Organisational Strengthening · Domain L</p>
+      <p class="qual-card-title">Early practice change signals</p>
+      <p class="qual-body">Three active partners reported that Q1 content directly informed an internal process or decision: one is developing an operating reserve policy; one revised its M&amp;E reporting template; one cited TLC content in a funding proposal submitted in March 2026. These are early signals of TLC contributing to organisational practice, not just knowledge.</p>
+      <p class="dq">Decision question: Is TLC supporting Blood:Water's organisational strengthening goals? (Domain L)</p>
+    </div>
+    <div class="qual-card">
+      <p class="qual-card-domain">Community Health &amp; Culture · Domain K</p>
+      <p class="qual-card-title">Positive culture signals</p>
+      <p class="qual-body">Facilitator and platform manager observations across Q1 sessions indicate high levels of candour in discussion, including members sharing resource constraints and programme failures. No moderation incidents recorded. Members are engaging with each other, not only with the facilitator. This is a positive early signal that the community-of-practice culture is taking root.</p>
+      <p class="dq">Decision question: Do members feel safe contributing? (Domain K)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── PLANNER ── -->
+<section id="planner">
+  <div class="section-hd"><h2>Annual offering planner</h2><span class="count-pill">2026</span></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterOfferings('all',this)">All tiers</button>
+    <button class="filter-btn" onclick="filterOfferings('active',this)">Active partners</button>
+    <button class="filter-btn" onclick="filterOfferings('general',this)">General members</button>
+    <button class="filter-btn" onclick="filterOfferings('alumni',this)">Alumni</button>
+    <button class="filter-btn" onclick="filterOfferings('all-tiers',this)">All member tiers</button>
+  </div>
+  <div class="planner-grid fade-in" id="planner-grid">
+    <div class="quarter-col">
+      <div class="quarter-hd q1">Q1 2026 · Jan–Mar</div>
+      <div class="offering-item" data-tiers="active alumni" onclick="openModal('Financial Resilience Part 1','Webinar (series)','Feb 2026','Ms. Fatima Diallo + CB Atelu','Delivered','65','61','4.2/5','Peer discussion space offered. Eligibility check completed.')">
+        <p class="offering-name">Financial Resilience for African CSOs (Part 1)</p>
+        <div class="offering-meta"><span class="s-pill s-delivered">Delivered</span><span style="color:var(--ink4)">Active partners + alumni</span></div>
+        <p class="offering-target">Target: 65 · Actual: 61</p>
+      </div>
+      <div class="offering-item" data-tiers="active alumni" onclick="openModal('Financial Resilience Part 2','Webinar (series)','Mar 2026','Ms. Fatima Diallo','Delivered','65','58','4.2/5','Pace check before Part 3. Peer discussion offered.')">
+        <p class="offering-name">Financial Resilience for African CSOs (Part 2)</p>
+        <div class="offering-meta"><span class="s-pill s-delivered">Delivered</span><span style="color:var(--ink4)">Active partners + alumni</span></div>
+        <p class="offering-target">Target: 65 · Actual: 58</p>
+      </div>
+    </div>
+    <div class="quarter-col">
+      <div class="quarter-hd q2">Q2 2026 · Apr–Jun</div>
+      <div class="offering-item" data-tiers="active alumni" onclick="openModal('Financial Resilience Parts 3–4','Webinar series (x2)','Mar–May 2026','Ms. Fatima Diallo','In preparation','55–65','TBC','TBC','Confirm Part 3 date. Brief facilitator on Part 1 learning.')">
+        <p class="offering-name">Financial Resilience Parts 3–4</p>
+        <div class="offering-meta"><span class="s-pill s-prep">In preparation</span><span style="color:var(--ink4)">Active partners + alumni</span></div>
+        <p class="offering-target">Target: 55–65 per session</p>
+      </div>
+      <div class="offering-item" data-tiers="active general" onclick="openModal('M&amp;E Systems Masterclass','Masterclass (half-day)','Apr 2026','Internal lead (Impact &amp; Learning)','Early planning','40','–','–','Tailor pre-session brief for General Member cohort.')">
+        <p class="offering-name">M&amp;E Systems Masterclass</p>
+        <div class="offering-meta"><span class="s-pill s-planning">Early planning</span><span style="color:var(--ink4)">Active + General members</span></div>
+        <p class="offering-target">Target: 40</p>
+      </div>
+      <div class="offering-item" data-tiers="all-tiers" onclick="openModal('AI and Digital Tools Workshop','Workshop (interactive)','May 2026','External facilitator + internal co-host','Concept development','50','–','–','Open registration by first week of April. High survey interest.')">
+        <p class="offering-name">AI and Digital Tools Workshop</p>
+        <div class="offering-meta"><span class="s-pill s-concept">Concept</span><span style="color:var(--ink4)">All member tiers</span></div>
+        <p class="offering-target">Target: 50</p>
+      </div>
+    </div>
+    <div class="quarter-col">
+      <div class="quarter-hd q3">Q3 2026 · Jul–Sep</div>
+      <div class="offering-item" data-tiers="active" onclick="openModal('Resource Mobilisation Peer Learning Circle','Peer coaching (x2)','Jul + Sep 2026','Internal lead (Development team)','To be scheduled','20–25','–','–','Application-based. Alumni welcome if space allows.')">
+        <p class="offering-name">Resource Mobilisation Peer Learning Circle</p>
+        <div class="offering-meta"><span class="s-pill s-schedule">To be scheduled</span><span style="color:var(--ink4)">Active partners only</span></div>
+        <p class="offering-target">Target: 20–25 per session</p>
+      </div>
+      <div class="offering-item" data-tiers="all-tiers" onclick="openModal('Climate Resilience and Programme Adaptation','Webinar','Aug 2026','External facilitator (climate/WASH)','Facilitator search','45','–','–','Links to WASH and food security themes from 2025 survey.')">
+        <p class="offering-name">Climate Resilience &amp; Programme Adaptation</p>
+        <div class="offering-meta"><span class="s-pill s-search">Facilitator search</span><span style="color:var(--ink4)">All member tiers</span></div>
+        <p class="offering-target">Target: 45</p>
+      </div>
+      <div class="offering-item" data-tiers="all-tiers" onclick="openModal('Gender Equity in Practice','Masterclass','Sep 2026','External facilitator','Concept stage','40','–','–','Member champion to be identified to co-facilitate.')">
+        <p class="offering-name">Gender Equity in Practice</p>
+        <div class="offering-meta"><span class="s-pill s-concept">Concept stage</span><span style="color:var(--ink4)">All member tiers</span></div>
+        <p class="offering-target">Target: 40</p>
+      </div>
+    </div>
+    <div class="quarter-col">
+      <div class="quarter-hd q4">Q4 2026 · Oct–Dec</div>
+      <div class="offering-item" data-tiers="active" onclick="openModal('Staff Care and Organisational Wellbeing','Reflective workshop','Oct 2026','External facilitator (psychosocial)','Early planning','30','–','–','Smaller, safer format. Confirm confidentiality protocol. Peer check-in one month after.')">
+        <p class="offering-name">Staff Care &amp; Organisational Wellbeing</p>
+        <div class="offering-meta"><span class="s-pill s-planning">Early planning</span><span style="color:var(--ink4)">Active partners</span></div>
+        <p class="offering-target">Target: 30</p>
+      </div>
+      <div class="offering-item" data-tiers="all-tiers" onclick="openModal('Year-End Member Learning Review &amp; Community Showcase','Community convening (virtual)','Dec 2026','CB Atelu + Advisory Committee','Planning begins Q3','80+','–','–','Anchor year-end event. Members present learning and practice change. Compile Stories of Change.')">
+        <p class="offering-name">Year-End Member Learning Review &amp; Showcase</p>
+        <div class="offering-meta"><span class="s-pill s-schedule">Planning Q3</span><span style="color:var(--ink4)">All member tiers</span></div>
+        <p class="offering-target">Target: 80+</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUALITATIVE FEEDBACK ── -->
+<section>
+  <div class="section-hd"><h2>Member voice &amp; emerging needs</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" class="fade-in">
+    <div style="background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.2rem;box-shadow:var(--shadow)">
+      <p style="font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);font-weight:600;margin-bottom:.5rem">Member voice</p>
+      <p style="font-size:12px;color:var(--ink2);line-height:1.65">"I applied the financial scenario exercise directly with my finance team." — Evidence of immediate application of learning.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.2rem;box-shadow:var(--shadow)">
+      <p style="font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);font-weight:600;margin-bottom:.5rem">Key learning this period</p>
+      <p style="font-size:12px;color:var(--ink2);line-height:1.65">New members need clearer orientation to TLC offerings and expectations. Action: simplify onboarding and pre-session communication.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--rule);border-radius:var(--card-r);padding:1.2rem;box-shadow:var(--shadow)">
+      <p style="font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);font-weight:600;margin-bottom:.5rem">Emerging member needs</p>
+      <p style="font-size:12px;color:var(--ink2);line-height:1.65">Demand for shorter sessions and post-event discussion spaces. Action: adapt future offerings accordingly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── STORIES ── -->
+<section id="stories">
+  <div class="section-hd"><h2>Stories of change</h2><span class="count-pill">Permanent section, refreshed quarterly</span></div>
+  <div class="stories-card fade-in">
+    <p class="stories-eyebrow">★ Q1 2026 entry</p>
+    <p class="stories-title">Beacon of Hope Finance team adopts scenario-planning tool</p>
+    <p class="stories-body">Following the Financial Resilience series, the finance team at Beacon of Hope adopted a shared scenario-planning tool with their board — the first step toward a formal operating reserve policy. This is a direct outcome linking TLC content to organisational decision-making in practice. (Linked to Q7 and Q11 member feedback.)</p>
+    <div class="stories-capture">
+      <p class="capture-label">Capture questions — applied each quarter</p>
+      <div class="capture-grid">
+        <div class="cq">What changed because of TLC?</div>
+        <div class="cq">What practice did a member adopt?</div>
+        <div class="cq">What challenge was overcome?</div>
+        <div class="cq">What partnership emerged?</div>
+        <div class="cq">What lesson surprised us?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RISKS ── -->
+<section id="risks">
+  <div class="section-hd"><h2>Risks &amp; attention points</h2></div>
+  <div class="flags-col fade-in">
+    <div class="flag">
+      <div class="flag-icon red">⚠️</div>
+      <div>
+        <p class="flag-title"><span class="flag-tag tag-red">FLAG</span>Open Issue 1 — Unengaged active partners</p>
+        <p class="flag-body">14 of 48 active partners have not yet engaged in any 2026 offering. Personal outreach underway.</p>
+        <p class="flag-action">Owner: CB Atelu · Action: Personal outreach by 30 April · Target resolution: Q2 week 2</p>
+      </div>
+    </div>
+    <div class="flag">
+      <div class="flag-icon red">⚠️</div>
+      <div>
+        <p class="flag-title"><span class="flag-tag tag-red">FLAG</span>Open Issue 2 — General member onboarding pace</p>
+        <p class="flag-body">Onboarding running at 40% of Q2 target (12 of 30). Onboarding sequence under review based on first cohort experience.</p>
+        <p class="flag-action">Owner: CB Atelu + OS Coordinator · Action: Revised sequence and welcome communication by end of May</p>
+      </div>
+    </div>
+    <div class="flag">
+      <div class="flag-icon amber">🕐</div>
+      <div>
+        <p class="flag-title"><span class="flag-tag tag-amber">RISK</span>AI &amp; Digital Tools Workshop — low sign-up risk</p>
+        <p class="flag-body">Registration not yet open for Q2 May workshop. Risk of low uptake if promoted too late. Current risk level: Moderate. Target: Low.</p>
+        <p class="flag-action">Recommendation: Begin promotion no later than first week of April · Leverage member champions</p>
+      </div>
+    </div>
+    <div class="flag">
+      <div class="flag-icon amber">📡</div>
+      <div>
+        <p class="flag-title"><span class="flag-tag tag-amber">RISK</span>Connectivity barriers affecting participation</p>
+        <p class="flag-body">12% of members reporting connectivity challenges, concentrated in 3 CSOs in rural border of Northeastern. Target: &lt;10%.</p>
+        <p class="flag-action">Action: Continue providing recordings and summaries · Explore low-bandwidth engagement options</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FUTURE DOMAINS ── -->
+<section id="future">
+  <div class="section-hd"><h2>Additional thematic domains — for future development</h2></div>
+  <div class="future-grid fade-in">
     <div class="fd-card">
       <span class="fd-letter">M</span>
       <p class="fd-domain">Future domain</p>
@@ -589,16 +887,250 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F5F4F2;color:var(--ink
       <p class="fd-body">A future indicator could track new offerings introduced in direct response to member feedback and the time taken to respond to emerging needs.</p>
     </div>
   </div>
-</div>
-</div>
+</section>
 
-<!-- FOOTER -->
-<div class="footer">
+<footer>
   <span>The Leader Collective — Progress Review Dashboard · Q1 2026</span>
-  <span>Prepared by Charles Bin Atelu, Community Engagement Specialist, The Leader Collective · Figures are illustrative based on healthy Q1 2026 platform performance</span>
+  <span>Prepared by Charles Bin Atelu, Platform Manager · Figures are illustrative based on healthy Q1 2026 platform performance</span>
+</footer>
 </div>
 
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── PARTICLES ──
+(function(){
+  const c=document.getElementById('particles'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<55;i++)pts.push({x:Math.random()*2000,y:Math.random()*1200,r:Math.random()*1.5+.5,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.2,a:Math.random()*.5+.1});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(22,163,74,${p.a})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── NAV ACTIVE ──
+function scrollTo(id){
+  document.querySelector(id)?.scrollIntoView({behavior:'smooth'});
+}
+function updateNav(){
+  const links=document.querySelectorAll('.nav-link');
+  const sections=document.querySelectorAll('section[id]');
+  let cur='';
+  sections.forEach(s=>{if(s.getBoundingClientRect().top<120)cur=s.id});
+  links.forEach(l=>{
+    l.classList.toggle('active',l.getAttribute('onclick')?.includes(cur));
+  });
+}
+window.addEventListener('scroll',updateNav,{passive:true});
+
+// ── BACK TO TOP ──
+const btt=document.getElementById('btt');
+window.addEventListener('scroll',()=>btt.classList.toggle('show',scrollY>400),{passive:true});
+
+// ── FADE IN ──
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+// ── BAR ANIMATION ──
+const barObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.bar-fill[data-w]').forEach(b=>{
+        setTimeout(()=>{b.style.width=b.dataset.w+'%'},200);
+      });
+    }
+  });
+},{threshold:.2});
+document.querySelectorAll('.ind-card,.ind-grid,.tab-pane').forEach(el=>barObs.observe(el));
+
+// ── TOOLTIPS ──
+const tt=document.getElementById('tooltip');
+document.querySelectorAll('[data-tip]').forEach(el=>{
+  el.addEventListener('mouseenter',e=>{
+    tt.textContent=el.dataset.tip;tt.style.opacity='1';
+  });
+  el.addEventListener('mousemove',e=>{
+    tt.style.left=(e.clientX+12)+'px';tt.style.top=(e.clientY-30)+'px';
+  });
+  el.addEventListener('mouseleave',()=>{tt.style.opacity='0'});
+});
+
+// ── TABS ──
+function showTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  // trigger bars
+  document.getElementById(id).querySelectorAll('.bar-fill[data-w]').forEach(b=>{
+    b.style.width='0';
+    setTimeout(()=>{b.style.width=b.dataset.w+'%'},100);
+  });
+}
+
+// ── FILTER OFFERINGS ──
+function filterOfferings(tier,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.offering-item').forEach(item=>{
+    const tiers=item.dataset.tiers||'';
+    item.style.display=(tier==='all'||tiers.includes(tier))?'block':'none';
+  });
+}
+
+// ── MODAL ──
+const offerings=[]; // enriched via onclick
+function openModal(name,type,date,lead,status,target,actual,rating,notes){
+  document.getElementById('modal-title').textContent=name;
+  document.getElementById('modal-tag').textContent=type;
+  document.getElementById('modal-sub').textContent='';
+  document.getElementById('modal-rows').innerHTML=`
+    <div class="modal-row"><span class="label">Date</span><span class="val">${date}</span></div>
+    <div class="modal-row"><span class="label">Facilitator / Lead</span><span class="val">${lead}</span></div>
+    <div class="modal-row"><span class="label">Status</span><span class="val">${status}</span></div>
+    <div class="modal-row"><span class="label">Registration target</span><span class="val">${target}</span></div>
+    <div class="modal-row"><span class="label">Actual registrations</span><span class="val">${actual}</span></div>
+    <div class="modal-row"><span class="label">Post-event rating</span><span class="val">${rating}</span></div>
+    <div class="modal-row" style="border:none"><span class="label">Follow-up / notes</span><span class="val" style="max-width:280px;text-align:right">${notes}</span></div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalBtn()}
+function closeModalBtn(){document.getElementById('modal-overlay').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalBtn()});
+
+// ── CHARTS ──
+const chartDefaults={
+  font:{family:"'Inter',system-ui,sans-serif"},
+  color:'#6B6560',
+};
+Chart.defaults.font=chartDefaults.font;
+Chart.defaults.color=chartDefaults.color;
+
+// Radar
+new Chart(document.getElementById('radarChart'),{
+  type:'radar',
+  data:{
+    labels:['Membership','Learning Offerings','Member Experience','Peer Learning','Org Strengthening','Accessibility'],
+    datasets:[{
+      label:'Q1 2026 (% of target)',
+      data:[78,95,90,53,73,93],
+      backgroundColor:'rgba(22,163,74,.15)',
+      borderColor:'#16A34A',
+      pointBackgroundColor:'#16A34A',
+      pointRadius:4,
+      borderWidth:2,
+    },{
+      label:'Target (100%)',
+      data:[100,100,100,100,100,100],
+      backgroundColor:'rgba(168,162,158,.08)',
+      borderColor:'rgba(168,162,158,.4)',
+      pointBackgroundColor:'rgba(168,162,158,.4)',
+      pointRadius:3,
+      borderWidth:1,
+      borderDash:[4,4],
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16,font:{size:11}}}},
+    scales:{r:{
+      min:0,max:100,
+      ticks:{stepSize:25,font:{size:9},backdropColor:'transparent'},
+      grid:{color:'rgba(231,229,228,.7)'},
+      pointLabels:{font:{size:10}},
+    }}
+  }
+});
+
+// Donut
+new Chart(document.getElementById('donutChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Engaged (34)','Not yet engaged (14)'],
+    datasets:[{
+      data:[34,14],
+      backgroundColor:['#16A34A','#FCA5A5'],
+      borderColor:['#F7F5F2','#F7F5F2'],
+      borderWidth:3,
+      hoverOffset:6,
+    }]
+  },
+  options:{
+    responsive:true,
+    cutout:'68%',
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:12,padding:14,font:{size:11}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed} partners`}}
+    }
+  }
+});
+
+// Bar: satisfaction
+new Chart(document.getElementById('barChart'),{
+  type:'bar',
+  data:{
+    labels:['Satisfaction','Content relevance','Recommend TLC','Apply to practice','Onboarding sat.'],
+    datasets:[{
+      label:'Score',
+      data:[84,78,82,68,76],
+      backgroundColor:['#16A34A','#16A34A','#16A34A','#D97706','#DC2626'],
+      borderRadius:6,
+    },{
+      label:'Target',
+      data:[80,75,80,70,80],
+      backgroundColor:'rgba(168,162,158,.3)',
+      borderRadius:6,
+    }]
+  },
+  options:{
+    responsive:true,
+    indexAxis:'y',
+    scales:{
+      x:{max:100,grid:{color:'rgba(231,229,228,.7)'},ticks:{font:{size:9},callback:v=>v+'%'}},
+      y:{grid:{display:false},ticks:{font:{size:9}}},
+    },
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},
+  }
+});
+
+// Membership bar chart
+new Chart(document.getElementById('membershipBar'),{
+  type:'bar',
+  data:{
+    labels:['Active\npartners','General\nmembers','Alumni','Avg attend.\n(per session)'],
+    datasets:[{
+      label:'Actual',
+      data:[71,40,90,104],
+      backgroundColor:['#D97706','#DC2626','#16A34A','#16A34A'],
+      borderRadius:6,
+    },{
+      label:'Target %',
+      data:[80,100,100,100],
+      backgroundColor:'rgba(168,162,158,.25)',
+      borderRadius:6,
+    }]
+  },
+  options:{
+    responsive:true,
+    scales:{
+      y:{max:110,grid:{color:'rgba(231,229,228,.7)'},ticks:{font:{size:9},callback:v=>v+'%'}},
+      x:{grid:{display:false},ticks:{font:{size:9}}},
+    },
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},
+  }
+});
+</script>
 </body>
 </html>
